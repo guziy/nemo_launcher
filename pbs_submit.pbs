@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#PBS -l procs=16
+#PBS -l walltime=12:00:00
+#PBS -A <put here your project's id>
+#PBS -o outputfile
+#PBS -e errorfile
+#PBS -N nemo
+
+cd ${PBS_O_WORKDIR}
+
+echo "Current directory: $(pwd)"
+
+# . ~/.profile.d/.interactive_profile
+. ~/.profile_nemo_offline
+
+./run.sh 16 >& run.log 
