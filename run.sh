@@ -2,23 +2,26 @@
 set -e
 set -x
 # repeat 1980 nyears times
-nyears=5
+nyears=20
 
 # if not spinup specify the folder with driving data
-spinup=false
+spinup=true
 original_driving_data_dir=/RESCUE/skynet3_rech1/huziy/ERA-Interim_0.75_NEMO_pilot
 prepared_driving_data_dir=./driving_data/
 
 
-start_year=1995
+start_year=1980
+
 
 # timestep is 1 hour
-steps_in_day=$(echo "24 * 12" | bc -l)   
+steps_in_day=$(echo "24" | bc -l)   
+
+timestep_sec=$(echo "24 * 3600 / ${steps_in_day}" | bc -l)
+
 
 output_freq_steps=${steps_in_day}
 
 
-firs_year=true
 ln_rstart=.false.
 
 
@@ -109,7 +112,6 @@ for i in $(seq 0 ${nyears}); do
 
 
 
-
 	restart_prefix_in=GLK_$(printf "%08d" $(echo "${nn_it000} - 1" | bc -l) )_restart
 	restart_prefix_out=GLK_$(printf "%08d" ${nn_itend})_restart
 
@@ -127,6 +129,7 @@ for i in $(seq 0 ${nyears}); do
 		sed -e "s/STARTDATE/${the_date}/" |\
 		sed -e "s/ISLEAPYEAR/${isleap}/" |\
 		sed -e "s/OUTPUTFREQUENCYTIMESTEPS/${output_freq_steps}/" |\
+		sed -e "s/TIMESTEPSEC/${timestep_sec}/" |\
 		sed -e "s|DRIVINGDATAROOTDIR|${prepared_driving_data_dir}|" > namelist
 
 		# Prepare namelist for the ice model
