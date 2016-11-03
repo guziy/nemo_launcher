@@ -138,12 +138,20 @@ for i in $(seq 0 ${nyears}); do
 		# Prepare the driving data for the next year of the simulation
 		if [ "${spinup}" = "false" ]; then
 			prepare_driving_data ${next_year}
+                else
+                        # Driving data does not change from year to year in case of spinup
+                        if [ "${next_year}" = "${start_year}"  ]; then
+                             prepare_driving_data ${next_year}
+                        fi
 		fi
 
 
 		# run a year
 		echo Running $(echo "${i} + ${start_year}" | bc -l)
 		mpirun -np $1 ./opa >& opa.log
+                
+                # check model exit code
+                rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 	fi
 
 
