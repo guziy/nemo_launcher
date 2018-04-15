@@ -2,19 +2,19 @@
 set -e
 set -x
 # repeat 1980 nyears times
-nyears=20
+nyears=1
 
 # if not spinup specify the folder with driving data
-spinup=true
-original_driving_data_dir=/RESCUE/skynet3_rech1/huziy/ERA-Interim_0.75_NEMO_pilot
+spinup=false
+original_driving_data_dir=../../../../../NEMO_OFFLINE_DRIVING_from_CORDEX_NA_044degt
 prepared_driving_data_dir=./driving_data/
 
 
 start_year=1980
 
 
-# timestep is 1 hour
-steps_in_day=$(echo "24" | bc -l)   
+# timestep is 30 min
+steps_in_day=$(echo "48" | bc -l)   
 
 timestep_sec=$(echo "24 * 3600 / ${steps_in_day}" | bc -l)
 
@@ -34,16 +34,23 @@ the_date=${start_year}0101
 
 ln_tsd_init=.true.
 
+isleap=0
 
 next_year=${start_year}
 
 
 #============================================================================================
+
+
+ndays_per_yea=365
 if [ "${spinup}" = "true" ]; then
 	prepared_driving_data_dir="./"
 	ndays_per_year=365
 else
-	ndays_per_year=$(cal ${start_year} | egrep -v "[a-z]|[0-9][0-9][0-9]" | wc -w)
+      
+	if [ "${isleap}" = "1" ]; then
+		ndays_per_year=$(cal ${start_year} | egrep -v "[a-z]|[0-9][0-9][0-9]" | wc -w)
+	fi
 fi
 
 # nn_itend=$(echo "${steps_in_day} * 150" | bc -l)  #$(echo "${nn_it000} + ${steps_in_day} * ${ndays_per_year} - 1" | bc -l)
@@ -104,11 +111,6 @@ for i in $(seq 0 ${nyears}); do
 	the_date="$(echo "${start_year} + ${i}" | bc -l)"0101
 
 	echo "Start date: ${the_date}"
-
-	isleap=0
-	if [ "${ndays_per_year}" = "366" ]; then
-		isleap=1
-	fi
 
 
 
