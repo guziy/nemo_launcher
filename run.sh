@@ -42,7 +42,7 @@ next_year=${start_year}
 #============================================================================================
 
 
-ndays_per_yea=365
+ndays_per_year=365
 if [ "${spinup}" = "true" ]; then
 	prepared_driving_data_dir="./"
 	ndays_per_year=365
@@ -66,7 +66,9 @@ prepare_driving_data(){
  	local varnames=(AD N4 UU VV PR SN TT HU)
 	local dest_filenames=(radlw.nc radsw.nc u10.nc v10.nc precip.nc snow.nc t2.nc q2.nc)
 
-
+        rm -rf ${prepared_driving_data_dir}
+	mkdir ${prepared_driving_data_dir}
+	
 	cd ${prepared_driving_data_dir}
 	
 	local v dest	
@@ -169,7 +171,10 @@ for i in $(seq 0 ${nyears}); do
 	# -- prepare driving data for the next year if not in spinup mode -- 
 	if [ "${spinup}" = "false" ]; then
 		next_year=$(echo "${start_year} + ${i} + 1" | bc -l)
-		ndays_per_year=$(cal ${next_year} |egrep -v "[a-z]|[0-9][0-9][0-9]" |wc -w)
+		
+		if [ "${isleap}" = "1" ]; then 
+                	ndays_per_year=$(cal ${next_year} |egrep -v "[a-z]|[0-9][0-9][0-9]" |wc -w)
+		fi
 
 		echo "Not a spinup, preparing driving data for ${next_year}"
 		
